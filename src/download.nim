@@ -19,7 +19,7 @@ proc download*(day: string, cookie: string) =
     client.headers = newHttpHeaders({ "Cookie": cook })
 
     let content = client.getContent(url)
-    echo "success!"
+    echo "Input download success!"
     writeFile("input.txt", content)
 
 

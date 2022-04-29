@@ -16,7 +16,7 @@ proc getFloors(inputTable: CountTable[char]): int =
 proc part1() =
     echo "[+] Part 1"
     let
-        input = readFile("input.txt")
+        input = readFile("input1.txt")
         counttable = input.toCountTable
 
     echo "Answer: ", $getFloors(counttable)
@@ -24,7 +24,7 @@ proc part1() =
 proc part2() =
     echo "[+] Part 2"
     let
-        input = readFile("input.txt")
+        input = readFile("input1.txt")
         charValue = { '(' : 1, ')' : -1 }.toTable
     var
         count = 0
@@ -38,6 +38,6 @@ proc part2() =
     echo "Answer: ", $ans
 
 when isMainModule:
-    download(day, Cookie)
+    discard download(day)
     part1()
     part2()

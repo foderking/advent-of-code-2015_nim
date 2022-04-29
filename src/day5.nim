@@ -1,7 +1,7 @@
-include templ
 import std/tables
 import std/strutils
 import std/re
+import download
 
 let
     day = "5"
@@ -70,7 +70,7 @@ proc part1() =
     echo "Part 1.."
     var
         count = 0
-    for input in lines("input.txt"):
+    for input in lines("input5.txt"):
         if input.validateNice:
             count.inc
 
@@ -132,7 +132,7 @@ proc part2() =
     echo "Part 2.."
     var
         count = 0
-    for input in lines("input.txt"):
+    for input in lines("input5.txt"):
         if input.altValidateNice:
             # echo [input]
             count.inc
@@ -150,7 +150,7 @@ proc Test() =
 
 
 when isMainModule:
-    download(day, Cookie)
+    discard download(day)
     # Test()
     part1()
     part2()

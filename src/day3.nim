@@ -2,7 +2,6 @@ import download
 import std/tables
 
 const
-    Cookie = "53616c7465645f5f286233854807ebf2e15e1f6171afd50d75c2bb44570165dbb1da648b9f80588b05066079605f6baf"
     day = "3"
 type
     Location = tuple
@@ -10,7 +9,7 @@ type
         y: int
 
 proc getInput(): string =
-    return readLines("input.txt")[0]
+    return readLines("input3.txt")[0]
 
 
 proc moveNorth(current: Location): Location =
@@ -186,7 +185,7 @@ proc part2() =
 
 when isMainModule:
     echo "Day 3"
-    download(day, Cookie)
+    discard download(day)
     part1()
     echo "Part 2"
     part2()

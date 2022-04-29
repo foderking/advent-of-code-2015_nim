@@ -1,13 +1,12 @@
-include templ
-
 import std/md5
 import std/strutils
+import download
 
 let
     day = "4"
 
 proc getInput(): string =
-    return readFile("input.txt").strip
+    return readFile("input4.txt").strip
 
 proc bruteForce(input: string): int =
     var
@@ -63,8 +62,8 @@ proc testBruteForce() =
 
 
 when isMainModule:
-    download(day, Cookie)
+    discard download(day)
     # echo getMD5("abcdef609043")
     # testBruteForce()
-    # part1()
+    part1()
     part2()

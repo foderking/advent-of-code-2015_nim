@@ -2,6 +2,8 @@
 
 Solutions to advent of code 2015 written in nim
 
+paste advent of code cookie in cookie.txt
+
 ## Requirements
 - nim
 - Git

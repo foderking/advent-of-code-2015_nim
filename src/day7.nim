@@ -1,88 +1,141 @@
-include templ
-import re, strutils
+import download
+import std/[strscans, strutils, tables]
 
 const
-    day = "7"
-    test01 = "44430 -> b"
-    test02 = "NOT gs -> gt"
-    test03 = "dd OR do -> dp"
-    test04 = "eg AND ei -> ej"
-    test05 = "y AND ae -> ag"
-    test06 = "jx AND jz -> ka"
-    test07 = "lf RSHIFT 2 -> lg"
-    test08 = "gn AND gp -> gq"
-    test09 = "z AND aa -> ac"
-    test10 = "dy AND ej -> el"
-    test11 = "bj OR bi -> bk"
-    test12 = "kk RSHIFT 3 -> km"
-    test13 = "NOT cn -> co"
+  day = "7"
+
 type
-    # a function to be performed to return vallue for a wire
-    wireFuncType = tuple
-        op: string # e.g `AND, OR, NOT, RSHIFT, LSHIFT`
-        params: array[2, string] # parameters for operation. the last string might be empty
-    ## Stores operation to be performed on a wire. could be a.. 
-    ## value move: e.g `2344  -> b`, or a, then `isVal` is true
-    ## function type: e.g `lf RSHIFT aa -> y`
-    wireOperation = tuple
-        value: int
-        isVal: bool
-        wireFunc: wireFuncType
-    # Contains the wire and the operation to be performed on it
-    wireType = object
-        wire: string
-        refVal: wireOperation
+  Oper = enum
+    And="AND",
+    Or="OR",
+    Lshift="LSHIFT",
+    Rshift="RSHIFT",
+    Not="NOT",
+    Null=""
+  Source = tuple
+    left: string
+    op  : Oper
+    right: string
 
-proc getStrVal(str: string): string =
-    return str.split(" -> ")[1]
+proc isDigit(s: string): bool=
+  try:
+    discard s.parseInt()
+    return true
+  except:
+    return false
 
-proc getRefVal(str: string): wireOperation =
-    let
-        main = str.split(" -> ")[0]
+proc getOp(line: string): (Source, string)=
+  const
+    Direct = "$+ -> $+"
+    And    = "$+ AND $+ -> $+"
+    Or     = "$+ OR $+ -> $+"
+    Not    = "NOT $+ -> $+"
+    Lsh    = "$+ LSHIFT $+ -> $+"
+    Rsh    = "$+ RSHIFT $+ -> $+"
+  var
+    left: string
+    right: string
+    dest: string
 
-proc parseVal(str: string): wireType =
-    let 
-        wire_val = str.getStrVal
-        wire_ref_val = str.getRefVal
+  if scanf(line, Lsh, left, right, dest):
+    result[1] = dest
+    result[0] = (left, Oper.Lshift, right)
+  elif scanf(line, Rsh, left, right, dest):
+    result[1] = dest
+    result[0] = (left, Oper.Rshift, right)
 
-    return wireType(wire: wire_val, refVal: wire_ref_val)
+  elif scanf(line, And, left, right, dest):
+    result[1] = dest
+    result[0] = (left, Oper.And, right)
+  elif scanf(line, Or, left, right, dest):
+    result[1] = dest
+    result[0] = (left, Oper.Or, right)
+
+  elif scanf(line, Not, right, dest):
+    result[1] = dest
+    result[0] = ("", Oper.Not, right)
+  elif scanf(line, Direct, right, dest):
+    result[1] = dest
+    result[0] = ("", Oper.Null, right)
+
+  else:
+    raiseAssert("adfa")
+
+proc solve(key: string,
+           hashMap: TableRef[string, Source],
+           wireValue: TableRef[string, uint16]): uint16=
+  var
+    tmp: Source
+    left: uint16
+    right: uint16
+
+  if key.isDigit:
+    return key.parseUInt.uint16
+  elif wireValue.contains(key):
+    return wireValue[key]
+  else:
+    tmp = hashMap[key]
+
+    case tmp.op
+    of Oper.And:
+      left = solve(tmp.left, hashMap, wireValue)
+      right = solve(tmp.right, hashMap, wireValue)
+      wireValue[key] = left and right
+      return wireValue[key]
+
+    of Oper.Or:
+      left = solve(tmp.left, hashMap, wireValue)
+      right = solve(tmp.right, hashMap, wireValue)
+      wireValue[key] = left or right
+      return wireValue[key]
+
+    of Oper.Null:
+      right = solve(tmp.right, hashMap, wireValue)
+      wireValue[key] = right
+      return wireValue[key]
+
+    of Oper.Not:
+      right = solve(tmp.right, hashMap, wireValue)
+      wireValue[key] = not right
+      return wireValue[key]
+
+    of Oper.Rshift:
+      left = solve(tmp.left, hashMap, wireValue)
+      right = solve(tmp.right, hashMap, wireValue)
+      wireValue[key] = left shr right
+      return wireValue[key]
+
+    of Oper.Lshift:
+      left = solve(tmp.left, hashMap, wireValue)
+      right = solve(tmp.right, hashMap, wireValue)
+      wireValue[key] = left shl right
+      return wireValue[key]
+    else:
+      raiseAssert("solve err")
 
 
-# proc parseOp(input: string): wireType =
-#     let
-#         AND     = re"AND"
-#         OR      = re"OR"
-#         NOT     = re"NOT"
-#         LSHIFT  = re"LSHIFT"
-#         RSHIFT  = re"RSHIFT"
-#         VALUE   = re"^\d+"
-#     if input.find(VALUE) != -1:
-#         return parseVal(input)
-#     elif input.find(AND) != -1:
-#         return parseAnd(input)
-#     elif input.find(OR) != -1:
-#         return parseOr(input)
-#     elif input.find(NOT) != -1:
-#         return parseNot(input)
-#     elif input.find(LSHIFT) != -1:
-#         return parseLshift(input)
-#     elif input.find(RSHIFT) != -1:
-#         return parseRshift(input)
+proc main()=
+  var
+    hashMap = newTable[string, Source]()
+    wireValue = newTable[string, uint16]()
+    key: string
+    val: Source
+  for each in lines("input7.txt"):
+     (val, key) = getOp(each)
+     hashMap[key] = val
+  # part 1
+  var
+    ans: uint16
+  ans = solve("a", hashMap, wireValue)
+  echo "Part 1 Answer: ", ans
+  # part 2
+  hashMap["b"].right = $ans
+  wireValue.clear
 
-proc testParseVal() =
-    discard parseVal(test01)
-    discard parseVal(test02)
-    discard parseVal(test03)
-    discard parseVal(test04)
-    discard parseVal(test05)
-    discard parseVal(test06)
-    discard parseVal(test07)
-    discard parseVal(test08)
+  ans = solve("a", hashMap, wireValue)
+  echo "Part 2 Answer: ", ans
 
-proc test() =
-    testParseVal()
 
 when isMainModule:
-    # download(day, Cookie)
-    # parseOp()
-    test()
+  discard download(day)
+  main()

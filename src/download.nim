@@ -1,8 +1,8 @@
-import std/httpclient
+import std/[httpclient, os, strutils]
 
 
 
-proc download*(day: string, cookie: string) =
+proc download*(day: string): string =
     ##
     ## Params
     ## =========
@@ -11,23 +11,30 @@ proc download*(day: string, cookie: string) =
     ## 
     ## cookie: session cookie value
     ##
-    let 
+    
+    let
+      filename = "input"&($day)&".txt"
+      cookie = readFile("cookie.txt").strip()
+
+    if fileExists(filename):
+      echo "[+] Retrieving file.."
+      return readFile(filename)
+
+    else:
+      echo "[+] Downloading file..."
+      let 
         client = newHttpClient()
         cook   = "session=" & cookie
         url    = "https://adventofcode.com/2015/day/" & day & "/input"
-    # echo url, " ", cook
-    client.headers = newHttpHeaders({ "Cookie": cook })
+      client.headers = newHttpHeaders({ "Cookie": cook })
+      let content = client.getContent(url)
 
-    let content = client.getContent(url)
-    echo "Input download success!"
-    writeFile("input.txt", content)
-
+      writeFile(filename, content)
+      return content
 
 proc testDownload() =
-    const Cookie = "53616c7465645f5f286233854807ebf2e15e1f6171afd50d75c2bb44570165dbb1da648b9f80588b05066079605f6baf"
     const day = "1"
-
-    download(day, Cookie)
+    echo download(day)
 
 when isMainModule:
     testDownload()

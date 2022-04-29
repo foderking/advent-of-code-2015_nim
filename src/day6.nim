@@ -1,4 +1,4 @@
-include templ
+import download
 import tables, strutils
 
 const
@@ -89,7 +89,7 @@ proc part1() =
         hashMap = initTable[Location, bool]()
 
     echo hashMap
-    for input in lines("input.txt"):
+    for input in lines("input6.txt"):
         parseInput(input, hashMap)
     var count = 0
     for each in hashMap.keys:
@@ -189,7 +189,7 @@ proc part2() =
         hashMap = initTable[Location, int]()
 
     echo hashMap
-    for input in lines("input.txt"):
+    for input in lines("input6.txt"):
         newParseInput(input, hashMap)
     echo "Result: ", hashMap.getCount
 
@@ -248,7 +248,7 @@ proc Tests() =
     testTurnOn()
 
 when isMainModule:
-    download(day, Cookie)
+    discard download(day)
     # Tests()
     part1()
     part2()

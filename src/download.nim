@@ -18,7 +18,7 @@ proc download*(day: string): string =
 
     if fileExists(filename):
       echo "[+] Retrieving file.."
-      return readFile(filename)
+      return readFile(filename).strip
 
     else:
       echo "[+] Downloading file..."
@@ -30,7 +30,7 @@ proc download*(day: string): string =
       let content = client.getContent(url)
 
       writeFile(filename, content)
-      return content
+      return content.strip
 
 proc testDownload() =
     const day = "1"

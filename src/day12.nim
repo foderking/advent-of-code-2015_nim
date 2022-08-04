@@ -33,10 +33,6 @@ proc part1(input:string)=
 
   echo "Part 2: ", getNo(obj)
 
-  
-
-
-
 
 when isMainModule:
   part1(download(day))

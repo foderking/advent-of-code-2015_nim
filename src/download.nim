@@ -1,4 +1,5 @@
 import std/[httpclient, os, strutils]
+import std/[strformat]
 
 
 
@@ -35,6 +36,12 @@ proc download*(day: string): string =
 proc testDownload() =
     const day = "1"
     echo download(day)
+
+template doPart1*(fn, day: untyped, submit=false)=
+  echo "[+] Part 1: "&($fn(download(day)))
+
+template doPart2*(fn, day: untyped, submit=false)=
+  echo "[+] Part 2: "&($fn(download(day)))
 
 when isMainModule:
     testDownload()

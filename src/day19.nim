@@ -61,8 +61,6 @@ proc part2(input: string): int=
       for vv in v:
         newhs.incl(replace(vv, @[k], s))
 
-    #echo s
-    #echo newhs
 
     for rr in newhs:
       mnm = min(mnm, solve(rr)+1)
@@ -71,16 +69,6 @@ proc part2(input: string): int=
     memo[s] = mnm
     hs.incl(newhs)
     return memo[s]
-  #[
-  q.addLast(("e", 0))
-  while q.len>0:
-    let (tmp, kkk) = q.popFirst()
-    for k in dict.keys():
-      for each in replace(k, dict[k], tmp):
-        if each==s: return kkk+1
-        #echo each
-        q.addLast((each, kkk+1))
-      ]#
   return solve(s)
 
 when isMainModule:

@@ -31,6 +31,7 @@ proc download*(day: string): string =
       let content = client.getContent(url)
 
       writeFile(filename, content)
+      echo "[-] File Downloaded..."
       return content.strip
 
 proc testDownload() =
@@ -42,6 +43,12 @@ template doPart1*(fn, day: untyped, submit=false)=
 
 template doPart2*(fn, day: untyped, submit=false)=
   echo "[+] Part 2: "&($fn(download(day)))
+
+proc partOne*[T](partFunc: proc(input: string): T, day: string) =
+  echo "[+] Part 1: ", $(partFunc(download(day)))
+
+proc partTwo*[T](partFunc: proc(input: string): T, day: string) =
+  echo "[+] Part 2: ", $(partFunc(download(day)))
 
 when isMainModule:
     testDownload()
